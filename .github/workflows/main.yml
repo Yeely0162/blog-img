@@ -5,22 +5,19 @@ on:
   schedule:
     - cron: '0 12 * * *'  # 每天UTC时间12:00运行（北京时间20:00）
 
+permissions:
+  contents: write  # 确保有写入权限
+
 jobs:
-  update-contributions:
+  build:
     runs-on: ubuntu-latest
     
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        # 明确指定目标仓库
-        repository: Yeely0162/blog-img
-        # 使用专用令牌而不是默认的 GITHUB_TOKEN
-        token: ${{ secrets.TARGET_REPO_TOKEN }}
-        ref: main  # 指定分支名
+      uses: actions/checkout@v2
       
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v2
       with:
         python-version: '3.10'
         
@@ -28,19 +25,17 @@ jobs:
       run: pip install -r requirements.txt
       
     - name: Run script
-      env:
-        GITHUB_USERNAME: ${{ secrets.GITHUB_USERNAME }}
       run: python Github_contributions.py
       
-    - name: 添加并提交更改
+    - name: add and change
       run: |
-        git config --global user.name 'GitHub Action'
-        git config --global user.email 'action@github.com'
-        git add github_contributions_*.json  # 添加生成的文件
-        git commit -m "Update Github Contribution [action]" || echo "No changes to commit"
-      
-    - name: 推送更改
-      run: git push origin main
+         git config --global user.name 'GitHub Action'
+         git config --global user.email 'action@github.com'
+         git add github_contributions_*.json  # 添加生成的文件
+         git commit -m "Update Github Contribution [action]" || echo "No changes to commit"
+      continue-on-error: true
+
+    - name: Push changes
       env:
-        # 使用专用令牌而不是默认的 GITHUB_TOKEN
-        GITHUB_TOKEN: ${{ secrets.TARGET_REPO_TOKEN }}
+       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: git push origin main
