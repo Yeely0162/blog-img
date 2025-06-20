@@ -1,0 +1,35 @@
+name: Update GitHub Contributions
+
+on:
+  workflow_dispatch:  # 允许手动触发
+  schedule:
+    - cron: '0 12 * * *'  # 每天UTC时间12:00运行（北京时间20:00）
+
+jobs:
+  update-contributions:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+        
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+      
+    - name: Run script
+      env:
+        GITHUB_USERNAME: ${{ secrets.GITHUB_USERNAME }}
+      run: python Github_contributions.py
+      
+    - name: Commit changes
+      run: |
+        git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add contributions.json
+        git commit -m "Update contributions data" || echo "没有变更可提交"
+        git push
