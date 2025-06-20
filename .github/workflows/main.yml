@@ -12,8 +12,14 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+      with:
+        # 明确指定目标仓库
+        repository: Yeely0162/blog-img
+        # 使用专用令牌而不是默认的 GITHUB_TOKEN
+        token: ${{ secrets.TARGET_REPO_TOKEN }}
+        ref: main  # 指定分支名
       
-    - name: Set up Python
+    - name: set up Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.10'
@@ -26,14 +32,15 @@ jobs:
         GITHUB_USERNAME: ${{ secrets.GITHUB_USERNAME }}
       run: python Github_contributions.py
       
-    - name: Commit changes
+    - name: add and change
       run: |
-         git config --global user.name 'GitHub Action'
-         git config --global user.email 'action@github.com'
-         git commit -m "Update Github Contribution [action]" || echo "No changes to commit"
-      continue-on-error: true
-
-    - name: Push changes
-      env:
-       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        git config --global user.name 'GitHub Action'
+        git config --global user.email 'action@github.com'
+        git add github_contributions_*.json  # 添加生成的文件
+        git commit -m "Update Github Contribution [action]" || echo "No changes to commit"
+      
+    - name: push change
       run: git push origin main
+      env:
+        # 使用专用令牌而不是默认的 GITHUB_TOKEN
+        GITHUB_TOKEN: ${{ secrets.TARGET_REPO_TOKEN }}
