@@ -71,7 +71,7 @@ class handler(BaseHTTPRequestHandler):
         return
 if __name__ == "__main__":
     # 方式1：直接指定用户名
-    username = "Barry-Flynn"  # 替换为实际的GitHub用户名
+    username = "Yeely0162"  # 替换为实际的GitHub用户名
     
     # 方式2：通过命令行参数获取用户名
     # if len(sys.argv) > 1:
